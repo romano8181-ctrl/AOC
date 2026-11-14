@@ -70,71 +70,71 @@ export function DelayForm({ flightId, onDone, showPreview = false }: DelayFormPr
 
   return (
     <div className={showPreview ? 'grid items-start gap-5 lg:grid-cols-2' : undefined}>
-    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
-      {!flightId && (
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
+        {!flightId && (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="delay-flight">Flight</Label>
+            <Controller
+              control={form.control}
+              name="flightId"
+              render={({ field }) => (
+                <FlightSelect id="delay-flight" value={field.value} onChange={field.onChange} invalid={!!errors.flightId} />
+              )}
+            />
+            {errors.flightId && <p className="text-xs text-destructive">{errors.flightId.message}</p>}
+          </div>
+        )}
+  
         <div className="flex flex-col gap-1.5">
-          <Label htmlFor="delay-flight">Flight</Label>
+          <Label htmlFor="delay-minutes">Delay (minutes)</Label>
+          <Input
+            id="delay-minutes"
+            type="number"
+            inputMode="numeric"
+            min={MIN_DELAY}
+            max={MAX_DELAY}
+            step={DELAY_STEP}
+            aria-invalid={!!errors.minutes}
+            aria-describedby="delay-minutes-hint"
+            {...form.register('minutes', { valueAsNumber: true })}
+          />
+          {errors.minutes ? (
+            <p id="delay-minutes-hint" className="text-xs text-destructive">{errors.minutes.message}</p>
+          ) : (
+            <p id="delay-minutes-hint" className="text-xs text-muted-foreground">
+              {MIN_DELAY}–{MAX_DELAY} min, in steps of {DELAY_STEP}. Delays add up.
+            </p>
+          )}
+        </div>
+  
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="delay-reason">Reason</Label>
           <Controller
             control={form.control}
-            name="flightId"
+            name="reason"
             render={({ field }) => (
-              <FlightSelect id="delay-flight" value={field.value} onChange={field.onChange} invalid={!!errors.flightId} />
+              <Select value={field.value ?? ''} onValueChange={field.onChange}>
+                <SelectTrigger id="delay-reason" className="w-full" aria-invalid={!!errors.reason}>
+                  <SelectValue placeholder="Choose a reason" />
+                </SelectTrigger>
+                <SelectContent>
+                  {DELAY_REASONS.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {r}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
           />
-          {errors.flightId && <p className="text-xs text-destructive">{errors.flightId.message}</p>}
+          {errors.reason && <p className="text-xs text-destructive">{errors.reason.message}</p>}
         </div>
-      )}
-
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="delay-minutes">Delay (minutes)</Label>
-        <Input
-          id="delay-minutes"
-          type="number"
-          inputMode="numeric"
-          min={MIN_DELAY}
-          max={MAX_DELAY}
-          step={DELAY_STEP}
-          aria-invalid={!!errors.minutes}
-          aria-describedby="delay-minutes-hint"
-          {...form.register('minutes', { valueAsNumber: true })}
-        />
-        {errors.minutes ? (
-          <p id="delay-minutes-hint" className="text-xs text-destructive">{errors.minutes.message}</p>
-        ) : (
-          <p id="delay-minutes-hint" className="text-xs text-muted-foreground">
-            {MIN_DELAY}–{MAX_DELAY} min, in steps of {DELAY_STEP}. Delays add up.
-          </p>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="delay-reason">Reason</Label>
-        <Controller
-          control={form.control}
-          name="reason"
-          render={({ field }) => (
-            <Select value={field.value ?? ''} onValueChange={field.onChange}>
-              <SelectTrigger id="delay-reason" className="w-full" aria-invalid={!!errors.reason}>
-                <SelectValue placeholder="Choose a reason" />
-              </SelectTrigger>
-              <SelectContent>
-                {DELAY_REASONS.map((r) => (
-                  <SelectItem key={r} value={r}>
-                    {r}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-        />
-        {errors.reason && <p className="text-xs text-destructive">{errors.reason.message}</p>}
-      </div>
-
-      <Button type="submit" disabled={!isValid} className="bg-status-warn text-[#3a2600] hover:bg-status-warn/90">
-        Apply delay
-      </Button>
-    </form>
-    {showPreview && <DelayImpactPreview flightId={watchedFlightId} minutes={watchedMinutes} />}
+  
+        <Button type="submit" disabled={!isValid} className="bg-status-warn text-[#3a2600] hover:bg-status-warn/90">
+          Apply delay
+        </Button>
+      </form>
+      {showPreview && <DelayImpactPreview flightId={watchedFlightId} minutes={watchedMinutes} />}
     </div>
   )
 }
