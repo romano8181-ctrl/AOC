@@ -10,21 +10,11 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react'
+import type { FlightStatus, GateState } from '@/domain/types'
 import { cn } from '@/lib/utils'
 
-/** Flight statuses (PRD 9.1) + gate states (PRD 9.3). */
-export type PillStatus =
-  | 'SCHEDULED'
-  | 'DELAYED'
-  | 'BOARDING'
-  | 'DEPARTED'
-  | 'LANDED'
-  | 'CANCELLED'
-  | 'AVAILABLE'
-  | 'RESERVED'
-  | 'OCCUPIED'
-  | 'UNAVAILABLE'
-  | 'CONFLICT'
+/** Flight statuses (PRD 9.1) + gate states (PRD 9.3) + a gate conflict marker. */
+export type PillStatus = FlightStatus | GateState | 'CONFLICT'
 
 interface PillStyle {
   label: string
