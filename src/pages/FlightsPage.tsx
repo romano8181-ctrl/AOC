@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react'
+import { FlightDetailsSheet } from '@/components/flights/FlightDetailsSheet'
 import { FlightFilters } from '@/components/flights/FlightFilters'
 import { FlightTable } from '@/components/flights/FlightTable'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { DEFAULT_QUERY, queryFlights, type FlightQuery, type SortField } from '@/domain/flightQuery'
 import { useConflicts, useFlights } from '@/store/selectors'
 
-// PRD 12.3 Flights. Filters live in local component state (T-11); details sheet comes in T-12.
+// PRD 12.3 Flights. Filters live in local component state; a row click opens the details sheet.
 export function FlightsPage() {
   const flights = useFlights()
   const conflicts = useConflicts()
   const [query, setQuery] = useState<FlightQuery>(DEFAULT_QUERY)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const visible = useMemo(() => queryFlights(flights, query), [flights, query])
 
   const clearFilters = () => setQuery((q) => ({ ...DEFAULT_QUERY, sortBy: q.sortBy, sortDir: q.sortDir }))
@@ -39,8 +41,10 @@ export function FlightsPage() {
           sortDir={query.sortDir}
           onSort={toggleSort}
           onClearFilters={clearFilters}
+          onSelect={(f) => setSelectedId(f.id)}
         />
       </div>
+      <FlightDetailsSheet flightId={selectedId} onClose={() => setSelectedId(null)} />
     </>
   )
 }
