@@ -6,34 +6,48 @@
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/500.css';
 
-/* AOC is dark-only (PRD 12.1). Tokens follow the shadcn/ui naming. */
+/* AOC is dark-only (PRD 12.1). Tokens follow the shadcn/ui naming.
+   Palette: deep airport navy + one friendly color per section + vivid status colors. */
 :root {
-  --radius: 0.5rem;
-  --background: #020617; /* slate-950 */
-  --foreground: #f1f5f9; /* slate-100 */
-  --card: #0f172a; /* slate-900 */
-  --card-foreground: #f1f5f9;
-  --popover: #0f172a;
-  --popover-foreground: #f1f5f9;
+  --radius: 0.625rem;
+  --background: #0a1328; /* deep navy */
+  --foreground: #eef2ff;
+  --card: #111c38; /* raised navy */
+  --card-foreground: #eef2ff;
+  --popover: #15213f;
+  --popover-foreground: #eef2ff;
   --primary: #38bdf8; /* sky-400 accent */
-  --primary-foreground: #020617;
-  --secondary: #1e293b; /* slate-800 */
-  --secondary-foreground: #f1f5f9;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8; /* slate-400 */
-  --accent: #1e293b;
-  --accent-foreground: #f1f5f9;
-  --destructive: #f43f5e; /* rose-500 */
-  --border: #1e293b;
-  --input: #334155; /* slate-700 */
+  --primary-foreground: #06101f;
+  --secondary: #1a2850;
+  --secondary-foreground: #eef2ff;
+  --muted: #1a2850;
+  --muted-foreground: #9fb0d4; /* soft blue-grey, 7:1 on background */
+  --accent: #1c2b55;
+  --accent-foreground: #eef2ff;
+  --destructive: #fb7185; /* rose-400 */
+  --border: #22325e;
+  --input: #2c3d6e;
   --ring: #38bdf8;
 
+  /* Brand gradient: sky -> indigo -> violet */
+  --brand-from: #38bdf8;
+  --brand-via: #818cf8;
+  --brand-to: #c084fc;
+
+  /* Section colors: each screen has its own friendly color */
+  --sec-overview: #38bdf8; /* sky */
+  --sec-flights: #a78bfa; /* violet */
+  --sec-gates: #2dd4bf; /* teal */
+  --sec-analytics: #fbbf24; /* amber */
+  --sec-simulator: #fb7185; /* coral */
+
   /* Operational status colors (PRD 12.1) */
-  --status-ok: #34d399; /* emerald-400 */
+  --status-ok: #4ade80; /* green-400 */
   --status-warn: #fbbf24; /* amber-400 */
-  --status-critical: #f43f5e; /* rose-500 */
+  --status-critical: #fb7185; /* rose-400 */
   --status-info: #38bdf8; /* sky-400 */
-  --status-neutral: #94a3b8; /* slate-400 */
+  --status-boarding: #a78bfa; /* violet-400 */
+  --status-neutral: #9fb0d4;
 
   color-scheme: dark;
 }
@@ -70,7 +84,18 @@
   --color-status-warn: var(--status-warn);
   --color-status-critical: var(--status-critical);
   --color-status-info: var(--status-info);
+  --color-status-boarding: var(--status-boarding);
   --color-status-neutral: var(--status-neutral);
+
+  --color-brand-from: var(--brand-from);
+  --color-brand-via: var(--brand-via);
+  --color-brand-to: var(--brand-to);
+
+  --color-sec-overview: var(--sec-overview);
+  --color-sec-flights: var(--sec-flights);
+  --color-sec-gates: var(--sec-gates);
+  --color-sec-analytics: var(--sec-analytics);
+  --color-sec-simulator: var(--sec-simulator);
 }
 
 @layer base {
@@ -79,6 +104,11 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    /* Soft colored glow in the corners so the page does not feel flat. */
+    background-image:
+      radial-gradient(60rem 30rem at 100% -10%, rgb(129 140 248 / 0.12), transparent 60%),
+      radial-gradient(50rem 30rem at -10% 110%, rgb(45 212 191 / 0.08), transparent 60%);
+    background-attachment: fixed;
   }
 }
 
