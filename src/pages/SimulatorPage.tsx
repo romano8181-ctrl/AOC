@@ -32,8 +32,8 @@ export function SimulatorPage() {
           </span>
         }
       />
-      <div className="grid gap-6 xl:grid-cols-5">
-        <section className="rounded-xl border bg-card/80 p-5 xl:col-span-3" aria-label="Scenarios">
+      <div className="grid gap-6 xl:grid-cols-3">
+        <section className="rounded-xl border bg-card/80 p-5 xl:col-span-2" aria-label="Scenarios">
           <Tabs defaultValue="delay" className="gap-5">
             <TabsList className="grid h-auto w-full grid-cols-2 gap-1 bg-background/60 p-1 md:grid-cols-4">
               {TABS.map(({ value, label, icon: Icon, active }) => (
@@ -55,7 +55,7 @@ export function SimulatorPage() {
           </Tabs>
         </section>
 
-        <section className="flex flex-col rounded-xl border bg-card/80 xl:col-span-2" aria-labelledby="event-log-title">
+        <section className="flex flex-col rounded-xl border bg-card/80" aria-labelledby="event-log-title">
           <div className="flex items-center gap-2 border-b px-5 py-3">
             <History className="size-4 text-sec-simulator" aria-hidden />
             <h2 id="event-log-title" className="font-semibold">

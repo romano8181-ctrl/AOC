@@ -39,14 +39,14 @@ export function DelayImpactPreview({ flightId, minutes }: DelayImpactPreviewProp
           <dl className="grid grid-cols-2 gap-3 text-sm">
             <div>
               <dt className="text-xs text-muted-foreground">{original.type === 'DEPARTURE' ? 'New ETD' : 'New ETA'}</dt>
-              <dd className="font-mono tabular-nums">
+              <dd className="font-mono whitespace-nowrap tabular-nums">
                 <span className="text-muted-foreground line-through">{toHHMM(original.estimatedTime)}</span>{' '}
                 <span className="font-semibold text-status-warn">{toHHMM(preview.value.flight.estimatedTime)}</span>
               </dd>
             </div>
             <div>
               <dt className="text-xs text-muted-foreground">Gate window</dt>
-              <dd className="font-mono tabular-nums">
+              <dd className="font-mono whitespace-nowrap tabular-nums">
                 {preview.value.window ? (
                   <>
                     {original.gateId} · {formatWindow(preview.value.window)}

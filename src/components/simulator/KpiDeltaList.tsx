@@ -22,7 +22,7 @@ export function KpiDeltaList({ before, after, metrics }: KpiDeltaListProps) {
         return (
           <div key={m.label} className="rounded-lg border bg-background/40 px-3 py-2">
             <dt className="text-xs text-muted-foreground">{m.label}</dt>
-            <dd className="flex items-center gap-1.5 font-mono text-sm tabular-nums">
+            <dd className="flex items-center gap-1.5 font-mono text-sm whitespace-nowrap tabular-nums">
               <span className={cn(changed && 'text-muted-foreground')}>{fmt(a)}</span>
               {changed && (
                 <>
