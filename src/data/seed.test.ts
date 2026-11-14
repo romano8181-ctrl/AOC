@@ -1,20 +1,15 @@
 import { describe, expect, it } from 'vitest'
-import type { Flight, FlightStatus, TimeWindow } from '@/domain/types'
+import type { Flight, FlightStatus } from '@/domain/types'
 import { DAY_END, DAY_START, LAST_MINUTE, SIM_NOW, fromHHMM } from '@/domain/time'
+import { getDelayMinutes } from '@/domain/flightRules'
+import { getWindow as windowOf, windowsOverlap as overlaps } from '@/domain/gateRules'
 import { AIRPORT, getAircraftType, getAirline } from './reference'
 import { SEED_FLIGHTS, SEED_GATES } from './seed'
 
-// Structural invariants of the demo dataset (PRD 13.2, 13.3, 13.5).
-// KPI values and scenarios S1–S5 are checked in T-07 once domain rules exist.
+// Invariants of the demo dataset (PRD 13.2, 13.3, 13.5). KPIs and scenarios S1–S5: scenarios.test.ts.
 
-// Local copy of BR-10 / BR-14 so this test does not depend on T-06 code.
-const windowOf = (f: Flight): TimeWindow =>
-  f.type === 'DEPARTURE'
-    ? { start: f.estimatedTime - 45, end: f.estimatedTime + 15 }
-    : { start: f.estimatedTime - 15, end: f.estimatedTime + 45 }
-const overlaps = (a: TimeWindow, b: TimeWindow) => a.start < b.end && b.start < a.end
-const delayOf = (f: Flight) => f.estimatedTime - f.scheduledTime
-const byNumber = (n: string) => SEED_FLIGHTS.find((f) => f.flightNumber === n)!
+const delayOf = getDelayMinutes
+const byNumber = (n: string, flights: Flight[] = SEED_FLIGHTS) => flights.find((f) => f.flightNumber === n)!
 const FINAL: FlightStatus[] = ['DEPARTED', 'LANDED']
 
 describe('seed gates', () => {
