@@ -6,7 +6,8 @@ import { Toaster } from '@/components/ui/sonner'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    {/* Toaster first: it must subscribe before App's effects can raise a toast on start-up. */}
     <Toaster />
+    <App />
   </StrictMode>,
 )
