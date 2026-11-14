@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
+import { AssignGateDialog } from '@/components/gates/AssignGateDialog'
 import { GateDetailsSheet } from '@/components/gates/GateDetailsSheet'
+import { Button } from '@/components/ui/button'
 import { GateGrid } from '@/components/gates/GateGrid'
 import { GateRequiredList } from '@/components/gates/GateRequiredList'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -16,6 +18,7 @@ export function GatesPage() {
   const required = useGateRequired()
   const [availableOnly, setAvailableOnly] = useState(false)
   const [openGateId, setOpenGateId] = useState<string | null>(null)
+  const [assignFlightId, setAssignFlightId] = useState<string | null>(null)
 
   const visible = useMemo(
     () => (availableOnly ? summaries.filter((s) => s.state === 'AVAILABLE') : summaries),
@@ -48,10 +51,22 @@ export function GatesPage() {
           </div>
         </div>
 
-        <GateRequiredList items={required} />
+        <GateRequiredList
+          items={required}
+          renderAction={(flight) => (
+            <Button
+              size="sm"
+              className="bg-sec-gates text-[#03241f] hover:bg-sec-gates/90"
+              onClick={() => setAssignFlightId(flight.id)}
+            >
+              {flight.gateId ? 'Reassign' : 'Assign gate'}
+            </Button>
+          )}
+        />
         <GateGrid summaries={visible} onOpen={setOpenGateId} />
       </div>
       <GateDetailsSheet gateId={openGateId} onClose={() => setOpenGateId(null)} />
+      <AssignGateDialog flightId={assignFlightId} onClose={() => setAssignFlightId(null)} />
     </>
   )
 }

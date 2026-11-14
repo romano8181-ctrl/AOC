@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { SEED_FLIGHTS, SEED_GATES } from '@/data/seed'
 import { applyDelay } from './flightRules'
-import { detectConflicts, getGateDayPlan, getWindow, summarizeGate } from './gateRules'
+import { detectConflicts, getAssignmentOptions, getGateDayPlan, getWindow, summarizeGate } from './gateRules'
 import { SIM_NOW } from './time'
 import type { Flight } from './types'
 
@@ -53,5 +53,27 @@ describe('getGateDayPlan', () => {
       expect(getWindow(plan[i - 1]).start).toBeLessThanOrEqual(getWindow(plan[i]).start)
     }
     expect(plan.map((f) => f.flightNumber)).toContain('AU101')
+  })
+})
+
+describe('getAssignmentOptions (US-006 AC2, TC-08)', () => {
+  it('after S1, AU101 can use A5 but not A3 (current), A4 (AU115) or B6 (closed)', () => {
+    const delayed = applyDelay(flight('AU101'), 45, 'Weather')
+    if (!delayed.ok) throw new Error(delayed.reason)
+    const flights = SEED_FLIGHTS.map((f) => (f.id === delayed.value.flight.id ? delayed.value.flight : f))
+    const options = getAssignmentOptions(flight('AU101', flights), SEED_GATES, flights)
+    const reasonOf = (id: string) => options.find((o) => o.gate.id === id)!.reason
+
+    expect(options).toHaveLength(12)
+    expect(reasonOf('A5')).toBeNull()
+    expect(reasonOf('A3')).toBe('Already assigned to this gate')
+    expect(reasonOf('A4')).toBe('Conflicts with AU115 12:15–13:15')
+    expect(reasonOf('B6')).toBe('Gate closed (Maintenance)')
+  })
+
+  it('LW330 (no gate) can use B3', () => {
+    const options = getAssignmentOptions(flight('LW330'), SEED_GATES, SEED_FLIGHTS)
+    expect(options.find((o) => o.gate.id === 'B3')!.reason).toBeNull()
+    expect(options.filter((o) => o.reason === null).length).toBeGreaterThan(0)
   })
 })

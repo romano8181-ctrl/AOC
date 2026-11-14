@@ -111,6 +111,17 @@ export function validateAssignment(flight: Flight, gate: Gate, flights: Flight[]
   return null
 }
 
+export interface AssignmentOption {
+  gate: Gate
+  /** null = the flight can use this gate; otherwise why not (shown next to the disabled option). */
+  reason: string | null
+}
+
+/** Every gate with its availability for this flight (US-006 AC2), terminal by terminal. */
+export function getAssignmentOptions(flight: Flight, gates: Gate[], flights: Flight[]): AssignmentOption[] {
+  return gates.map((gate) => ({ gate, reason: validateAssignment(flight, gate, flights) }))
+}
+
 /** BR-18: manual assignment never creates a conflict. Returns the updated flight and the old gate. */
 export function assignGate(
   flight: Flight,

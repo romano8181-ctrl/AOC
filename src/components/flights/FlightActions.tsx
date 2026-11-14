@@ -1,6 +1,7 @@
-import { Ban, Hourglass, Lock, PlaneLanding, PlaneTakeoff, Users } from 'lucide-react'
+import { Ban, DoorOpen, Hourglass, Lock, PlaneLanding, PlaneTakeoff, Users } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { AssignGateDialog } from '@/components/gates/AssignGateDialog'
 import { CancelForm } from '@/components/simulator/CancelForm'
 import { DelayForm } from '@/components/simulator/DelayForm'
 import { Button } from '@/components/ui/button'
@@ -18,7 +19,7 @@ const STATUS_BUTTONS: Partial<Record<FlightStatus, { label: string; icon: typeof
 // FR-017, US-004: only the transitions the domain allows are offered.
 export function FlightActions({ flight }: { flight: Flight }) {
   const changeStatus = useAocStore((s) => s.changeStatus)
-  const [dialog, setDialog] = useState<'delay' | 'cancel' | null>(null)
+  const [dialog, setDialog] = useState<'delay' | 'cancel' | 'gate' | null>(null)
   const allowed = getAllowedTransitions(flight)
 
   if (allowed.length === 0) {
@@ -56,6 +57,15 @@ export function FlightActions({ flight }: { flight: Flight }) {
             Delay…
           </Button>
         )}
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-sec-gates/50 text-sec-gates hover:bg-sec-gates/15 hover:text-sec-gates"
+          onClick={() => setDialog('gate')}
+        >
+          <DoorOpen aria-hidden />
+          {flight.gateId ? 'Reassign gate…' : 'Assign gate…'}
+        </Button>
         {allowed.includes('CANCELLED') && (
           <Button size="sm" variant="outline" className="border-status-critical/50 text-status-critical hover:bg-status-critical/15 hover:text-status-critical" onClick={() => setDialog('cancel')}>
             <Ban aria-hidden />
@@ -64,7 +74,8 @@ export function FlightActions({ flight }: { flight: Flight }) {
         )}
       </div>
 
-      <Dialog open={dialog !== null} onOpenChange={(open) => !open && setDialog(null)}>
+      <AssignGateDialog flightId={dialog === 'gate' ? flight.id : null} onClose={() => setDialog(null)} />
+      <Dialog open={dialog === 'delay' || dialog === 'cancel'} onOpenChange={(open) => !open && setDialog(null)}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{dialog === 'delay' ? `Delay ${flight.flightNumber}` : `Cancel ${flight.flightNumber}`}</DialogTitle>
