@@ -1,5 +1,11 @@
 import { useMemo } from 'react'
-import { detectConflicts, getGateRequired, getGateState } from '@/domain/gateRules'
+import {
+  detectConflicts,
+  getGateDayPlan,
+  getGateRequired,
+  getGateState,
+  summarizeGate,
+} from '@/domain/gateRules'
 import { computeAnalytics, computeKpis } from '@/domain/kpi'
 import { buildAlerts, eventsNewestFirst, getFlightEvents, getUpcomingFlights } from '@/domain/overview'
 import type { Gate, GateState } from '@/domain/types'
@@ -48,6 +54,22 @@ export function useGateStates(): GateWithState[] {
   const gates = useGates()
   const simNow = useSimNow()
   return useMemo(() => gates.map((gate) => ({ gate, state: getGateState(gate, flights, simNow) })), [gates, flights, simNow])
+}
+
+export function useGateSummaries() {
+  const flights = useFlights()
+  const gates = useGates()
+  const simNow = useSimNow()
+  const conflicts = useConflicts()
+  return useMemo(
+    () => gates.map((g) => summarizeGate(g, flights, simNow, conflicts)),
+    [gates, flights, simNow, conflicts],
+  )
+}
+
+export function useGateDayPlan(gateId: string | null) {
+  const flights = useFlights()
+  return useMemo(() => (gateId ? getGateDayPlan(gateId, flights) : []), [gateId, flights])
 }
 
 export function useGateRequired() {

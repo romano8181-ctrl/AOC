@@ -148,6 +148,38 @@ export function reopenGate(gate: Gate): Result<{ gate: Gate }> {
   return ok({ gate: { ...gate, isClosed: false, closedReason: null } })
 }
 
+export interface GateSummary {
+  gate: Gate
+  state: GateState
+  hasConflict: boolean
+  /** Holding flight whose window contains simNow. */
+  current: Flight | undefined
+  /** Next holding flight whose window starts after simNow. */
+  next: Flight | undefined
+  /** Every non-cancelled flight using this gate today, incl. departed (FR-021). */
+  flightsToday: number
+}
+
+/** Everything a gate card shows (FR-020…FR-022), derived from the same rules as the state. */
+export function summarizeGate(gate: Gate, flights: Flight[], simNow: Minutes, conflicts: GateConflict[]): GateSummary {
+  const holding = getGateAssignments(gate.id, flights)
+  return {
+    gate,
+    state: getGateState(gate, flights, simNow),
+    hasConflict: conflicts.some((c) => c.gateId === gate.id),
+    current: holding.find((f) => getWindow(f).start <= simNow && simNow < getWindow(f).end),
+    next: holding.find((f) => getWindow(f).start > simNow),
+    flightsToday: flights.filter((f) => f.gateId === gate.id && f.status !== 'CANCELLED').length,
+  }
+}
+
+/** Gate day plan for the details sheet: every non-cancelled flight on the gate, by window start. */
+export function getGateDayPlan(gateId: string, flights: Flight[]): Flight[] {
+  return flights
+    .filter((f) => f.gateId === gateId && f.status !== 'CANCELLED')
+    .sort((a, b) => getWindow(a).start - getWindow(b).start)
+}
+
 /** Flights that need operator action (FR-027): active without a gate, or in a gate conflict. */
 export interface GateRequiredItem {
   flight: Flight
