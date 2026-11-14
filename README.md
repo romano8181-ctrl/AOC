@@ -3,6 +3,8 @@
 Educational simulation of an airport operations dashboard: flights, gates, incidents and KPIs
 for a fictional airport (AUR · Aurora International). Not a certified aviation system.
 
+**Live demo:** https://aoc-lime.vercel.app
+
 ## Run
 
 ```bash
