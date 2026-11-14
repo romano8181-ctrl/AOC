@@ -46,7 +46,7 @@ export function SimulatorPage() {
             {TABS.map(({ value, hint }) => (
               <TabsContent key={value} value={value} className="flex flex-col gap-4">
                 <p className="text-sm text-muted-foreground">{hint}</p>
-                {value === 'delay' && <DelayForm />}
+                {value === 'delay' && <DelayForm showPreview />}
                 {value === 'cancel' && <CancelForm />}
                 {value === 'close' && <CloseGateForm />}
                 {value === 'reassign' && <ReassignForm />}

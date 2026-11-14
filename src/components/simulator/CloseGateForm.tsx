@@ -18,11 +18,13 @@ import {
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { isActive } from '@/domain/flightRules'
 import { formatWindow, getWindow } from '@/domain/gateRules'
+import { previewGateClosure } from '@/domain/impact'
 import { GATE_CLOSURE_REASONS } from '@/domain/types'
-import { useFlights, useGates } from '@/store/selectors'
+import { useFlights, useGates, useSimNow } from '@/store/selectors'
 import { useAocStore } from '@/store/useAocStore'
+import { KpiDeltaList } from './KpiDeltaList'
+import { CLOSURE_METRICS } from './kpiMetrics'
 
 // FR-032, BR-19…BR-21, US-009: gate + reason, preview of affected flights, confirmation.
 
@@ -35,6 +37,7 @@ type CloseValues = z.infer<typeof schema>
 export function CloseGateForm() {
   const gates = useGates()
   const flights = useFlights()
+  const simNow = useSimNow()
   const closeGate = useAocStore((s) => s.closeGate)
   const navigate = useNavigate()
   const [pending, setPending] = useState<CloseValues | null>(null)
@@ -43,11 +46,12 @@ export function CloseGateForm() {
   const gateId = form.watch('gateId')
 
   const openGates = gates.filter((g) => !g.isClosed)
-  // Same rule as closeGate (BR-19): active flights on the gate lose it.
-  const affected = useMemo(
-    () => flights.filter((f) => f.gateId === gateId && isActive(f)).sort((a, b) => a.estimatedTime - b.estimatedTime),
-    [flights, gateId],
+  // Dry run of the real closeGate rule (BR-19), so the preview can never disagree with the action.
+  const preview = useMemo(
+    () => (gateId ? previewGateClosure(flights, gates, simNow, gateId) : null),
+    [flights, gates, simNow, gateId],
   )
+  const affected = preview?.ok ? preview.value.affected : []
 
   const confirm = () => {
     if (!pending) return
@@ -139,6 +143,11 @@ export function CloseGateForm() {
                   </li>
                 ))}
               </ul>
+            )}
+            {preview?.ok && (
+              <div className="mt-3">
+                <KpiDeltaList before={preview.value.kpiBefore} after={preview.value.kpiAfter} metrics={CLOSURE_METRICS} />
+              </div>
             )}
           </div>
         )}

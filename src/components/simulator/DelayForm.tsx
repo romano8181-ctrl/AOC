@@ -11,6 +11,7 @@ import { DELAY_STEP, MAX_DELAY, MIN_DELAY, validateDelayMinutes } from '@/domain
 import { detectConflicts, isInConflict } from '@/domain/gateRules'
 import { DELAY_REASONS } from '@/domain/types'
 import { useAocStore } from '@/store/useAocStore'
+import { DelayImpactPreview } from './DelayImpactPreview'
 import { FlightSelect } from './FlightSelect'
 
 // FR-030, BR-06/07, US-007. Amount rules come from the domain (validateDelayMinutes);
@@ -30,9 +31,11 @@ interface DelayFormProps {
   /** Fixed flight (from the details sheet); omit to show a flight picker. */
   flightId?: string
   onDone?: () => void
+  /** Show the impact preview next to the form (Simulator). */
+  showPreview?: boolean
 }
 
-export function DelayForm({ flightId, onDone }: DelayFormProps) {
+export function DelayForm({ flightId, onDone, showPreview = false }: DelayFormProps) {
   const applyDelay = useAocStore((s) => s.applyDelay)
   const navigate = useNavigate()
   const form = useForm<DelayValues>({
@@ -41,6 +44,8 @@ export function DelayForm({ flightId, onDone }: DelayFormProps) {
     defaultValues: { flightId: flightId ?? '', minutes: 45, reason: undefined },
   })
   const { errors, isValid } = form.formState
+  const watchedFlightId = form.watch('flightId')
+  const watchedMinutes = form.watch('minutes')
 
   const onSubmit = (values: DelayValues) => {
     const result = applyDelay(values.flightId, values.minutes, values.reason)
@@ -64,6 +69,7 @@ export function DelayForm({ flightId, onDone }: DelayFormProps) {
   }
 
   return (
+    <div className={showPreview ? 'grid items-start gap-5 lg:grid-cols-2' : undefined}>
     <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4" noValidate>
       {!flightId && (
         <div className="flex flex-col gap-1.5">
@@ -128,5 +134,7 @@ export function DelayForm({ flightId, onDone }: DelayFormProps) {
         Apply delay
       </Button>
     </form>
+    {showPreview && <DelayImpactPreview flightId={watchedFlightId} minutes={watchedMinutes} />}
+    </div>
   )
 }
